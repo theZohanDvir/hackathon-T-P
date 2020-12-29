@@ -1,44 +1,53 @@
+########## imports ##########
 from socket import *
 from _thread import *
 import threading
 from struct import *
 from time import *
 
+########## variables ##########
+IP = '192.168.14.6'
+IP = ''
+host = gethostname()                           
+portUDP = 13401
+portTCP = 13601
+bufsize = 1024
 
-def pyUDPServer():
+def TCPgame():
+    print( "d:start game")
+    print( "Welcome to Keyboard Spamming Battle Royale.")
 
-    # create a socket object
-    serversocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
-    # get local machine name
-    host = gethostname()                           
-    port = 9999                                           
-    # Enable broadcasting mode
-    serversocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-    # Set a timeout so the socket does not block
-    # indefinitely when trying to receive data.
-    serversocket.settimeout(0.2)
-    message = b"your very important message"
-    # for i in range(11):
-        serversocket.sendto(message, ('<broadcast>', 9999))
-        print("message sent!")
-        sleep(1)
-    serversocket.close()
+def pyTCPServer():
+    # todo: add tuple for difrent TCP , 2 groups
     TCPserverSocket = socket(AF_INET, SOCK_STREAM)
-    TCPserverSocket.bind(('',port))
+    TCPserverSocket.bind((IP,portTCP))
     # queue up to 5 requests
-    TCPserverSocket.listen(3)                                           
-
+    TCPserverSocket.listen(3)
     while True:
         # establish a connection
-        clientsocket,addr = TCPserverSocket.accept()      
+        connectionSocket ,addr = TCPserverSocket.accept() #stops until
+        response = connectionSocket.recv(bufsize)
         print("Got a connection from %s" % str(addr))
         clientsocket.send(b'congragulations')
 
-    clientsocket.close()
+def pyUDPServer():
+    # create a socket object
+    serverSocket = socket(AF_INET, SOCK_DGRAM)
+    serverSocket.bind((IP,portUDP))
+    print ("d:The server is ready to receive")
+    message = pack('IBH',4276993775,2,portTCP)
+    for i in range(11):
+        serverSocket.sendto(message, ('<broadcast>', portUDP))
+        print("d:message sent!")
+        sleep(1)
+        pass
 
 def main():
-    print("Hello World! this is the server!!")
-    pyUDPServer()
+    print("d:Server started, listening on IP address" + IP)
+    # todo: need perallel
+    while 1:
+        pyUDPServer()
+        pyTCPServer()
 
 if __name__ == "__main__":
     main()
