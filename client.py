@@ -37,8 +37,12 @@ def pyUDPClient():
     # print ("d: waiting for message" )
     clientSocket.bind(("", portUDP))
     data, addr = clientSocket.recvfrom(bufsize) # waiting for invaites
+    print ( "addr:" + str(addr))
     print ("Received offer from " + addr[0] +", attempting to connect...")
     magicCookie, messageType, serverPort = unpack('IBH',data)
+    print ("magicCookie: " + str(magicCookie))
+    print ("messageType: " + str(messageType))
+    print ("server port: " + str(serverPort))
     if ( magicCookie != 4276993775 or messageType != 2):
         print( " magicCookie != 4276993775 and messageType != 2 ")
     pyTCPClient(addr, serverPort)
