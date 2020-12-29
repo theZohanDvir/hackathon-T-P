@@ -6,6 +6,7 @@ from time import sleep
 ########## variables ##########
 teamName = "KeybSpammers"
 IP = '192.168.1.104'
+IP = '192.168.14.6'
 #IP = ''
 host = gethostname()                           
 portUDP = 13401
@@ -17,6 +18,9 @@ def TCPgame(clientsocket):
     print( "d:start game")
     response = clientsocket.recv(bufsize) # waiting for the game start message
     print (response.decode("utf-8"))
+    while 1:
+        response = clientsocket.recv(bufsize) # waiting for the game start message
+        print ("response from TCP: " + response.decode("utf-8"))
 
 
 def pyTCPClient(address, serverPort):
@@ -45,12 +49,12 @@ def pyUDPClient():
     print ("server port: " + str(serverPort))
     if ( magicCookie != 4276993775 or messageType != 2):
         print( " magicCookie != 4276993775 and messageType != 2 ")
+    clientSocket.close()
     pyTCPClient(addr, serverPort)
     # message = "i want to connect"
     # clientSocket.sendto(message,(IP,portUDP))
     # print ("d:" + addr )
     # print ("d:received message: %s"%data)
-    clientSocket.close()
     
 
 def main():
