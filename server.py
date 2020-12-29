@@ -4,22 +4,8 @@ import threading
 from struct import *
 from time import *
 
-# def openTCPConnection( clientAddress ):
-#     print( "begin TCP " )
-#     serverPort = 2010
-#     serverSocket = socket(AF_INET,SOCK_STREAM)
-#     serverSocket.bind(('',serverPort))
-#     serverSocket.listen(1)
-#     print( "The server is ready to receive" )
-#     while 1:
-#         print( "wait for TCP message" )
-#         connectionSocket, addr = serverSocket.accept()
-#         print ( connectionSocket )
-#         print ( addr )
-#         sentence = connectionSocket.recv(2010)
-#         connectionSocket.send(sentence.lower())
-#         connectionSocket.close()
 
+<<<<<<< HEAD
 # def pyUDPServer():
 #     print( "begin the server" )
 #     serverPort = 2010
@@ -69,6 +55,10 @@ from time import *
 
 
 def pyUDPServer2():
+=======
+def pyUDPServer():
+
+>>>>>>> b40772276b60f8853abe809c7f9a30c1e2c34414
     # create a socket object
     serversocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
     # get local machine name
@@ -82,23 +72,36 @@ def pyUDPServer2():
     # indefinitely when trying to receive data.
     serversocket.settimeout(0.2)
     message = b"your very important message"
-    for i in range(11):
+    # for i in range(11):
         serversocket.sendto(message, ('<broadcast>', 9999))
         print("message sent!")
         sleep(1)
+<<<<<<< HEAD
     # queue up to 5 requests
     serversocket.listen(3)                                           
     while True:
         # establish a connection
         clientsocket,addr = serversocket.accept()      
+=======
+    
+    TCPserverSocket = socket(AF_INET, SOCK_STREAM)
+    TCPserverSocket.bind(('',port))
+
+    # queue up to 5 requests
+    TCPserverSocket.listen(3)                                           
+
+    while True:
+        # establish a connection
+        clientsocket,addr = TCPserverSocket.accept()      
+
+>>>>>>> b40772276b60f8853abe809c7f9a30c1e2c34414
         print("Got a connection from %s" % str(addr))
         currentTime = ctime(time()) + "\r\n"
         clientsocket.send(currentTime.encode('ascii'))
-        sleep(2)
 
 def main():
     print("Hello World! this is the server!!")
-    pyUDPServer2()
+    pyUDPServer()
 
 if __name__ == "__main__":
     main()
