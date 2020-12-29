@@ -6,7 +6,7 @@ from struct import *
 from time import *
 
 ########## variables ##########
-IP = '192.168.14.6'
+#IP = '192.168.14.6'
 IP = ''
 host = gethostname()                           
 portUDP = 13401
@@ -28,12 +28,12 @@ def pyTCPServer():
         connectionSocket ,addr = TCPserverSocket.accept() #stops until
         response = connectionSocket.recv(bufsize)
         print("Got a connection from %s" % str(addr))
-        clientsocket.send(b'congragulations')
 
 def pyUDPServer():
     # create a socket object
-    serverSocket = socket(AF_INET, SOCK_DGRAM)
-    serverSocket.bind((IP,portUDP))
+    serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+    serverSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+    #serverSocket.bind((IP,portUDP))
     print ("d:The server is ready to receive")
     message = pack('IBH',4276993775,2,portTCP)
     for i in range(11):

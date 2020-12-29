@@ -16,15 +16,15 @@ bufsize = 2048
 def TCPgame(clientsocket):
     print( "d:start game")
     response = clientsocket.recv(bufsize) # waiting for the game start message
-    print ("response".decode("utf-8"))
+    print (response.decode("utf-8"))
 
 
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
     # TCP connection   
     clientsocket = socket(AF_INET, SOCK_STREAM)
-    clientsocket.connect((address[0],serverPort))
-    clientsocket.send('i need you i want you')
+    clientsocket.connect((address[0],address[1]))
+    clientsocket.send(b'i need you i want you')
     TCPgame(clientsocket)
     clientsocket.close()
 
@@ -37,8 +37,12 @@ def pyUDPClient():
     # print ("d: waiting for message" )
     clientSocket.bind(("", portUDP))
     data, addr = clientSocket.recvfrom(bufsize) # waiting for invaites
+    print ( "addr:" + str(addr))
     print ("Received offer from " + addr[0] +", attempting to connect...")
     magicCookie, messageType, serverPort = unpack('IBH',data)
+    print ("magicCookie: " + str(magicCookie))
+    print ("messageType: " + str(messageType))
+    print ("server port: " + str(serverPort))
     if ( magicCookie != 4276993775 or messageType != 2):
         print( " magicCookie != 4276993775 and messageType != 2 ")
     pyTCPClient(addr, serverPort)
