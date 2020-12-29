@@ -49,8 +49,8 @@ def main():
     start_new_thread(threaded_udp_message,(serverSocket,))
     
     print ("d:The server is ready to receive")
-        pyTCPServer()
-
+    pyTCPServer()
+        
 
 if __name__ == "__main__":
     main()
