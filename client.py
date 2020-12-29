@@ -1,19 +1,5 @@
-# from server import openTCPConnection
+
 from socket import *
-
-pavelIP = '192.168.1.104'
-
-# def openTCPConnection(serverAddress):
-#     print("TCP client connection")
-#     serverPort=2010
-#     serverName= pavelIP #the IP you want to connect to
-#     clientSocket = socket(AF_INET,SOCK_STREAM)
-#     clientSocket.connect(serverAddress)
-#     message = b"UDP 2"
-#     clientSocket.send(message)
-#     modifiedMessage = clientSocket.recv(2055)
-#     print(" from TCP: " + str(modifiedMessage, 'utf-8') )
-#     clientSocket.close()
 
 
 def pyUDPClient():
@@ -41,19 +27,8 @@ def pyUDPClient():
     clientsocket.send('i need you i want you')
 
     response = clientSocket.recv(1024)
-    print (response)
 
-
-    # serverPort=2010
-    # serverName = pavelIP #the IP you want to connect to
-    # clientSocket = socket(AF_INET,SOCK_DGRAM)
-    # while 1:
-    #     message, serverAddress = clientSocket.recvfrom(1024)
-        # print(message)
-
-    # message = b"HEY Tomer its ron and we connect server to client"
-    # clientSocket.sendto(message,(serverName,serverPort))
-    
+    print("The time got from the server is %s" % response.decode('ascii'))
 
 
 def main():
