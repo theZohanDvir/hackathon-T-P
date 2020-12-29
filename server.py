@@ -1,19 +1,39 @@
 from socket import *
 
+def openTCPConnection( clientAddress ):
+    print( "begin TCP " )
+    serverPort = 2010
+    serverSocket = socket(AF_INET,SOCK_STREAM)
+    serverSocket.bind(('',serverPort))
+    serverSocket.listen(1)
+    print( "The server is ready to receive" )
+    while 1:
+        print( "wait for TCP message" )
+        connectionSocket, addr = serverSocket.accept()
+        print ( connectionSocket )
+        print ( addr )
+        sentence = connectionSocket.recv(2010)
+        connectionSocket.send(sentence.lower())
+        connectionSocket.close()
+
 def pyUDPServer():
     print( "begin the server" )
     serverPort = 2010
-    severSocket = socket(AF_INET,SOCK_DGRAM)
-    severSocket.bind(('',serverPort))
+    serverSocket = socket(AF_INET,SOCK_DGRAM)
+    serverSocket.bind(('',serverPort))
     print( "The server is ready to receive" )
     while 1:
-        print( "wait for message" )
-        messsage, clientAddress = severSocket.recvfrom(2010)
+        print( "wait for UDP message" )
+        messsage, clientAddress = serverSocket.recvfrom(2010)
         print ("message: " + str(messsage, 'utf-8') ) # need to be translated back to str from bytes
-        modifiedMessage = messsage.upper() # a func on the message
-        print (modifiedMessage)
-        severSocket.sendto(modifiedMessage,clientAddress)
+        if ( str(messsage, 'utf-8') == "UDP 1" ):
+            serverSocket.sendto(messsage.upper(),clientAddress)
+            openTCPConnection( clientAddress )
+        # modifiedMessage = messsage.upper() # a func on the message
+        #print (modifiedMessage)
+        #serverSocket.sendto(modifiedMessage,clientAddress)
         pass
+
 
 def main():
     print("Hello World! this is the server!!")
