@@ -55,8 +55,7 @@ def pyUDPClient():
 
 def main():
     print("d: client begin")
-    while 1:
-        address = pyUDPClient()
+    address = pyUDPClient()
         
 
 
