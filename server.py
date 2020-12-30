@@ -7,7 +7,7 @@ from time import *
 import traceback
 
 ########## variables ##########
-debug=2
+debug = 2
 IP = '192.168.1.104'
 IP = '192.168.14.6'
 # IP = ''
@@ -94,6 +94,17 @@ def reminderStart():
     global reminderStartGame
     reminderStartGame = True
 
+lstTCPs={}
+def acceptor(TCPserverSocket):
+    global lstTCPs
+    global minPlayers
+    global timesUP
+    # establish a connection
+    while (not timesUP):
+        print("d: Socket.accept()" + IP) if debug >= 2 else None
+        connectionSocket ,addr = TCPserverSocket.accept() #stops until
+        lstTCPs[connectionSocket] = addr
+
 def pyTCPServer():
     global debug
     global connected
@@ -105,13 +116,10 @@ def pyTCPServer():
     TCPserverSocket.bind((IP,portTCP))
     # queue up to 5 requests
     TCPserverSocket.listen(3)
-    lstTCPs = {}
+    global lstTCPs
     start_new_thread(reminder,())
+    start_new_thread(acceptor,(TCPserverSocket,))
     while (not timesUP):
-        # establish a connection
-        print("d: Socket.accept()" + IP) if debug >= 2 else None
-        connectionSocket ,addr = TCPserverSocket.accept() #stops until
-        lstTCPs[connectionSocket] = addr
         # note: minPlayers!!
         if ( len(lstTCPs) >= minPlayers ):
             print("d:if ( len(lstTCPs)") if debug >= 2 else None
@@ -125,10 +133,10 @@ def pyTCPServer():
                     pass
                 print("d:pass - pyTCPServer") if debug >= 2 else None
                 pass
-            while 1:
-                sleep(20)
-                if (connected == 0):
-                    return
+            # while 1:
+            #     sleep(20)
+            #     if (connected == 0):
+            #         return
     print("d:pyTCPServer end" + IP) if debug >= 2 else None
         
         

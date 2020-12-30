@@ -7,7 +7,7 @@ from threading import Timer
 
 
 ########## variables ##########
-debug = 2
+debug = 0
 IP = '192.168.1.104'
 IP = '192.168.14.6'
 #IP = ''
@@ -22,7 +22,7 @@ localCNT = 0
 def on_press(key):
     global clientsocketTCPsend
     global localCNT
-    print(str(key))
+    print(str(key)) if debug >= 2 else None
     try:
         clientsocketTCPsend.sendall(str(key).encode('utf-8'))
         localCNT+=1
@@ -60,7 +60,7 @@ def TCPgame(clientsocket):
 
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
-    # TCP connection   
+    # TCP connection
     
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
