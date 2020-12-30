@@ -73,7 +73,7 @@ def pyUDPClient():
     # message = "d: i want to connect"
     # clientSocket.sendto(message,(IP,portUDP))
     # print ("d: waiting for message" )
-    clientSocket.bind(("", portUDP))
+    clientSocket.bind((IP, portUDP))
     data, addr = clientSocket.recvfrom(bufsize) # waiting for invaites
     print ( "addr:" + str(addr))
     print ("Received offer from " + addr[0] +", attempting to connect...")

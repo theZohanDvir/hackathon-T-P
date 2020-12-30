@@ -19,20 +19,20 @@ timesUP = False
 reminderStartGame = False
 minPlayers = 2
 connected = 0
+lstTCPs = {}
 
 def TCPgame(connectionSocket,addr):
     global timesUP
     cnt = 0
-    connectionSocket.sendall(b"Welcome to Keyboard Spamming Battle Royale.")
+    connectionSocket.sendall("Welcome to Keyboard Spamming Battle Royale.".encode())
     team_name = connectionSocket.recv(bufsize)
-    print("Team name is : " + str(team_name))
+    print("Team name is : " + team_name.decode())
     # add teamname and socket to dict
     global teamsDict
     teamsDict[team_name] = connectionSocket
     print("Got a connection from %s" % str(addr))
     global connected
     connected +=1
-    # print(timesUP)
     while not timesUP:
         sleep(0.1)
         pass
@@ -41,12 +41,10 @@ def TCPgame(connectionSocket,addr):
         pass
     start_new_thread(reminderStart,())
     print("game is live from port " + str(addr[1]))
-    connectionSocket.send(b"Start pressing keys on your keyboard as fast as you can!!")
+    connectionSocket.send("Start pressing keys on your keyboard as fast as you can!!".encode('utf-8'))
     while not reminderStartGame:
         response = (connectionSocket.recv(bufsize)).decode("utf-8")
-        # print("r:" + response)
         if ( response == "done"):
-            print("d: break, send score")
             break
         if (len(response)>0 and response != "b''"):
             cnt+=1
@@ -88,6 +86,22 @@ def reminderStart():
     global reminderStartGame
     reminderStartGame = True
 
+def acceptor(TCPserverSocket):
+    global lstTCPs
+    global minPlayers
+    while (not timesUP):
+    connectionSocket ,addr = TCPserverSocket.accept() #stops until
+        lstTCPs[connectionSocket] = addr
+        if ( len(lstTCPs) >= minPlayers ):
+            for targCon in lstTCPs:
+                try:
+                    start_new_thread(TCPgame,(targCon,lstTCPs[targCon]))
+                    pass
+                except connectionSocket.timeout:
+                    pass
+                pass
+
+
 def pyTCPServer():
     global timesUP
     global minPlayers
@@ -96,10 +110,11 @@ def pyTCPServer():
     TCPserverSocket.bind((IP,portTCP))
     # queue up to 5 requests
     TCPserverSocket.listen(3)
-    lstTCPs = {}
+    start_new_thread(acceptor,(TCPserverSocket,))
     start_new_thread(reminder,())
     while (not timesUP):
         # establish a connection
+
         connectionSocket ,addr = TCPserverSocket.accept() #stops until
         lstTCPs[connectionSocket] = addr
         if ( len(lstTCPs) >= minPlayers ):
@@ -118,7 +133,6 @@ def threaded_udp_message(serverSocket):
     message = pack('IBH',4276993775,2,portTCP)
     for i in range(10):
         serverSocket.sendto(message, ('<broadcast>', portUDP))
-        print("d:message sent!")
         sleep(1)
         pass
     # connection closed 
