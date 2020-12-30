@@ -16,32 +16,47 @@ portUDP = 13401
 portTCP = 13601
 bufsize = 2048
 clientsocketTCPsend = None
+localCNT = 0
 ##########
 
-
 def on_press(key):
-    print(str(key))
     global clientsocketTCPsend
-    clientsocketTCPsend.sendall(str(key).encode('utf-8'))
+    global localCNT
+    print(str(key))
+    try:
+        clientsocketTCPsend.sendall(str(key).encode('utf-8'))
+        localCNT+=1
+    except:
+        print("not sent: " + str(key))
+        pass
+    
 
 def TCPgame(clientsocket):
     global clientsocketTCPsend
     clientsocketTCPsend = clientsocket
+    print(clientsocketTCPsend)
     print( "d:start game")
     response = clientsocket.recv(bufsize) # waiting for the game start message
     print (response.decode("utf-8"))
     groupName = input("Enter the group name: ")
     clientsocket.send(bytes(groupName, 'utf-8')) # sends the name
+    print(str(clientsocket.recv(bufsize))) # print start typeing
     with Listener(on_press=on_press) as listener:  # Create an instance of Listener
         Timer(10, listener.stop).start()
         listener.join()  # Join the listener thread to the main thread to keep waiting for keys
-    gameScoreMessage = clientsocket.recv(bufsize)
-    print(str(gameScoreMessage))
+    try:
+        print("d:start wait for server answer?")
+        print(str(clientsocket.recv(bufsize))) # waiting for score
+    except:
+        print("d:didn't get score from server.")
+        pass
+    print("d:localCNT: " + str(localCNT))
 
 
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
     # TCP connection   
+    
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
     TCPgame(clientsocket)
@@ -75,9 +90,7 @@ def pyUDPClient():
 
 def main():
     print("d: client begin")
-    #while 1:
     address = pyUDPClient()
-        
 
 
 if __name__ == "__main__":
