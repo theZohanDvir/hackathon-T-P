@@ -27,10 +27,14 @@ def TCPgame(connectionSocket,addr):
     while 1:
         response = str(connectionSocket.recv(bufsize))
         print("r:" + response)
-        if ( 'a' >= response and 'z' <=response):
+        if ( response == "b''"):
+            break
+        if (len(response)>0 and response != "b''"):
             cnt+=1
         if (cnt %10 ==0 ):
             print(str(groupNamge) + ":" +str(cnt))
+    print ("finel score: " + str(cnt))
+    connectionSocket.send(("your score is: " + str(cnt)).encode('utf-8') )
 
 def pyTCPServer():
     # todo: add tuple for difrent TCP , 2 groups
