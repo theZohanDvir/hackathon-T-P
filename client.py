@@ -2,6 +2,9 @@
 from socket import *
 from struct import unpack
 from time import sleep
+from pynput.keyboard import Listener
+from threading import Timer
+
 
 ########## variables ##########
 teamName = "KeybSpammers"
@@ -12,15 +15,29 @@ host = gethostname()
 portUDP = 13401
 portTCP = 13601
 bufsize = 2048
+clientsocketTCPsend = 0
 ##########
 
+
+def on_press(key):
+    print("Key pressed: {0}".format(key))
+
+def on_release(key):
+    print("Key released: {0}".format(key))
+
 def TCPgame(clientsocket):
+    clientsocketTCPsend = clientsocket
     print( "d:start game")
+    # groupName = input("Enter the group name: ")
+    # clientsocket.send(bytes(groupName, 'utf-8'))
     response = clientsocket.recv(bufsize) # waiting for the game start message
     print (response.decode("utf-8"))
-    while 1:
-        response = clientsocket.recv(bufsize) # waiting for the game start message
-        print ("response from TCP: " + response.decode("utf-8"))
+    with Listener(on_press=on_press, on_release=on_release) as listener:  # Create an instance of Listener
+        Timer(10, listener.stop).start()
+        listener.join()  # Join the listener thread to the main thread to keep waiting for keys
+    # while 1:
+    #     response = clientsocket.recv(bufsize) # waiting for the game start message
+    #     print ("response from TCP: " + response.decode("utf-8"))
 
 
 def pyTCPClient(address, serverPort):
