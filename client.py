@@ -8,8 +8,8 @@ from threading import Timer
 
 ########## variables ##########
 teamName = "KeybSpammers"
-IP = '192.168.1.104'
 IP = '192.168.14.6'
+IP = '192.168.1.104'
 #IP = ''
 host = gethostname()                           
 portUDP = 13401
@@ -43,9 +43,10 @@ def TCPgame(clientsocket):
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
     # TCP connection   
+    
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
-    clientsocket.send(b'i need you i want you')
+    clientsocket.send(input("Enter team name :").encode('utf-8'))
     TCPgame(clientsocket)
     clientsocket.close()
 
@@ -77,7 +78,6 @@ def pyUDPClient():
 def main():
     print("d: client begin")
     address = pyUDPClient()
-        
 
 
 if __name__ == "__main__":

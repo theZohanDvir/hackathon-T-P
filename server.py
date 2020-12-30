@@ -7,18 +7,22 @@ from time import *
 import traceback
 
 ########## variables ##########
-IP = '192.168.1.104'
 IP = '192.168.14.6'
+IP = '192.168.1.104'
 # IP = ''
 host = gethostname()                           
 portUDP = 13401
 portTCP = 13601
 bufsize = 1024
 
+teamsDict = {}
+
 def TCPgame(connectionSocket,addr):
     print( "d:start game")
     print( "Welcome to Keyboard Spamming Battle Royale.")
-    response = connectionSocket.recv(bufsize)
+    team_name = connectionSocket.recv(bufsize)
+    # add teamname and socket to dict
+    teamsDict[team_name] = connectionSocket
     print("Got a connection from %s" % str(addr))
     connectionSocket.send(b'congragulations')
     while 1:
@@ -41,7 +45,7 @@ def pyTCPServer():
             pass
         except connectionSocket.timeout:
             pass
-        
+    
         
 
 def threaded_udp_message(serverSocket): 
