@@ -42,10 +42,13 @@ def TCPgame(clientsocket):
     clientsocket.send(bytes(groupName, 'utf-8')) # sends the name
     print(str(clientsocket.recv(bufsize))) # print start typeing
     with Listener(on_press=on_press) as listener:  # Create an instance of Listener
-        Timer(9, listener.stop).start()
+        Timer(10, listener.stop).start()
+        print("test1")
         listener.join()  # Join the listener thread to the main thread to keep waiting for keys
+    print("test2")
     try:
         print("d:start wait for server answer?")
+        clientsocket.sendall(str("done").encode('utf-8'))
         print(str(clientsocket.recv(bufsize))) # waiting for score
     except:
         print("d:didn't get score from server.")
