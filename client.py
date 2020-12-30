@@ -20,19 +20,18 @@ clientsocketTCPsend = 0
 
 
 def on_press(key):
-    print("Key pressed: {0}".format(key))
-
-def on_release(key):
-    print("Key released: {0}".format(key))
+    print(str(key))
+    if ( clientsocketTCPsend != 0):
+        clientsocketTCPsend.send(str(key).encode('utf-8'))
 
 def TCPgame(clientsocket):
     clientsocketTCPsend = clientsocket
     print( "d:start game")
-    # groupName = input("Enter the group name: ")
-    # clientsocket.send(bytes(groupName, 'utf-8'))
     response = clientsocket.recv(bufsize) # waiting for the game start message
     print (response.decode("utf-8"))
-    with Listener(on_press=on_press, on_release=on_release) as listener:  # Create an instance of Listener
+    groupName = input("Enter the group name: ")
+    clientsocket.send(bytes(groupName, 'utf-8'))
+    with Listener(on_press=on_press) as listener:  # Create an instance of Listener
         Timer(10, listener.stop).start()
         listener.join()  # Join the listener thread to the main thread to keep waiting for keys
     # while 1:
@@ -45,9 +44,9 @@ def pyTCPClient(address, serverPort):
     # TCP connection   
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
-    clientsocket.send(b'i need you i want you')
     TCPgame(clientsocket)
     clientsocket.close()
+    clientsocketTCPsend=0
 
 def pyUDPClient():
     print("Client started, listening for offer requests...")
@@ -76,8 +75,8 @@ def pyUDPClient():
 
 def main():
     print("d: client begin")
-    while 1:
-        address = pyUDPClient()
+    #while 1:
+    address = pyUDPClient()
         
 
 

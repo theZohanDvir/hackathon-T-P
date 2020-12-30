@@ -16,14 +16,21 @@ portTCP = 13601
 bufsize = 1024
 
 def TCPgame(connectionSocket,addr):
+    cnt = 0
     print( "d:start game")
     print( "Welcome to Keyboard Spamming Battle Royale.")
-    response = connectionSocket.recv(bufsize)
     print("Got a connection from %s" % str(addr))
     connectionSocket.send(b'congragulations')
+    groupNamge = connectionSocket.recv(bufsize)
+    print(str(groupNamge))
+    print("game is live from port " + str(addr[1]))
     while 1:
-        print("game is live from port " + str(addr[1]))
-        sleep(0.5)
+        response = str(connectionSocket.recv(bufsize))
+        print("r:" + response)
+        if ( 'a' >= response and 'z' <=response):
+            cnt+=1
+        if (cnt %10 ==0 ):
+            print(str(groupNamge) + ":" +str(cnt))
 
 def pyTCPServer():
     # todo: add tuple for difrent TCP , 2 groups
@@ -41,6 +48,9 @@ def pyTCPServer():
             pass
         except connectionSocket.timeout:
             pass
+    for con in lstTCPs:
+        con.send(b"Start pressing keys on your keyboard as fast as you can!!")
+        pass
         
         
 
