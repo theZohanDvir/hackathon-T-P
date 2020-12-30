@@ -7,7 +7,7 @@ from time import *
 import traceback
 
 ########## variables ##########
-debug = 2
+debug = 0
 IP = '192.168.1.104'
 IP = '192.168.14.6'
 # IP = ''
@@ -128,15 +128,17 @@ def pyTCPServer():
                     start_new_thread(TCPgame,(targCon,lstTCPs[targCon]))
                     print("d:start_new_thread(TCPgame") if debug >= 2 else None
                     pass
-                except connectionSocket.timeout:
+                except errorExcept: # !!!!!!!!!!!!!!!!!
                     print("d:connectionSocket.timeout") if debug >= 2 else None
                     pass
                 print("d:pass - pyTCPServer") if debug >= 2 else None
                 pass
-            # while 1:
-            #     sleep(20)
-            #     if (connected == 0):
-            #         return
+            break
+    sleep(5)
+    while True:
+        sleep(1)
+        if connected == 0:
+            break
     print("d:pyTCPServer end" + IP) if debug >= 2 else None
         
         
@@ -160,8 +162,6 @@ def main():
     start_new_thread(threaded_udp_message,(serverSocket,))
     pyTCPServer()
     print("d:Server shutdown") if debug >= 1 else None
-
-        
 
 if __name__ == "__main__":
     main()
