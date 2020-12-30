@@ -8,8 +8,8 @@ from threading import Timer
 
 ########## variables ##########
 teamName = "KeybSpammers"
-IP = '192.168.1.104'
 IP = '192.168.14.6'
+IP = '192.168.1.104'
 #IP = ''
 host = gethostname()                           
 portUDP = 13401
@@ -42,7 +42,7 @@ def TCPgame(clientsocket):
     clientsocket.send(bytes(groupName, 'utf-8')) # sends the name
     print(str(clientsocket.recv(bufsize))) # print start typeing
     with Listener(on_press=on_press) as listener:  # Create an instance of Listener
-        Timer(10, listener.stop).start()
+        Timer(9, listener.stop).start()
         listener.join()  # Join the listener thread to the main thread to keep waiting for keys
     try:
         print("d:start wait for server answer?")
