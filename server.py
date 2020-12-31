@@ -8,8 +8,8 @@ import traceback
 import random
 
 ########## variables ##########
-IP = '192.168.14.6'
 IP = '192.168.1.104'
+IP = '192.168.14.6'
 # IP = ''
 host = gethostname()                           
 portUDP = 13401
