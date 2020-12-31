@@ -12,8 +12,8 @@ IP = '192.168.14.6'
 IP = '192.168.1.104'
 #IP = ''
 host = gethostname()                           
-portUDP = 13401
-portTCP = 13601
+portUDP = 2010
+portTCP = 2010
 bufsize = 2048
 clientsocketTCPsend = None
 localCNT = 0
@@ -66,11 +66,12 @@ def pyTCPClient(address, serverPort):
 
 def pyUDPClient():
     print("Client started, listening for offer requests...")
+    print(host)
     clientSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
     clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-    clientSocket.bind((IP, portUDP))
+    clientSocket.bind(("", portUDP))
     data, addr = clientSocket.recvfrom(bufsize) # waiting for invaites
-    print ("Received offer from " + addr[0] +", attempting to connect...")
+    # print ("Received offer from " + addr[0] +", attempting to connect...")
     magicCookie, messageType, serverPort = unpack('IBH',data)
     if ( magicCookie != 4276993775 or messageType != 2):
         print( " magicCookie != 4276993775 and messageType != 2 ")
