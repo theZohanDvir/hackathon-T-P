@@ -18,7 +18,7 @@ bufsize = 1024
 teamsDict = {}
 timesUP = False
 reminderStartGame = False
-minPlayers = 1
+minPlayers = 2
 connected = 0
 debug = 0
 lstTCPs = {}
@@ -55,6 +55,13 @@ def countGroupsScore(i):
         return groupCount(group1)
     elif i == 2:
         return groupCount(group2)
+
+def winningGroup():
+    global group1,group2
+    if(groupCount(1)>=groupCount(2)):
+        return 1
+    else:
+        return 2
 ####### /GROUP METHODS ########
 
 def createGameMessage():
@@ -80,12 +87,6 @@ def groupTeamNames(i):
             a = a + str(item) + "\n"
     return a
 
-def winningGroup():
-    global group1,group2
-    if(len(group1)>=len(group2)):
-        return 1
-    else:
-        return 2
 
 def createEndMessage():
     global group1,group2
@@ -111,9 +112,9 @@ def TCPgame(connectionSocket,addr):
     while not timesUP:
         sleep(0.1)
         pass
-    while ( connected != minPlayers ):
-        sleep(0.01)
-        pass
+    # while ( connected != minPlayers ):
+    #     sleep(0.01)
+    #     pass
     start_new_thread(reminderStart,())
     message = createGameMessage()
     connectionSocket.sendall(message.encode("utf-8")) # start game message
