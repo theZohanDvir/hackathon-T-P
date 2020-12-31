@@ -12,15 +12,15 @@ IP = '192.168.1.104'
 IP = '192.168.14.6'
 # IP = ''
 host = gethostname()                           
-portUDP = 13401
-portTCP = 13601
-bufsize = 1024
+portUDP = 2010
+portTCP = 2010
+bufsize = 2048
 teamsDict = {}
 timesUP = False
 reminderStartGame = False
-minPlayers = 2
+minPlayers = 0
 connected = 0
-debug = 0
+debug = 2
 lstTCPs = {}
 group1 = {}
 group2 = {}
@@ -58,7 +58,7 @@ def countGroupsScore(i):
 
 def winningGroup():
     global group1,group2
-    if(groupCount(1)>=groupCount(2)):
+    if(groupCount(group1)>=groupCount(group2)):
         return 1
     else:
         return 2
@@ -124,8 +124,8 @@ def TCPgame(connectionSocket,addr):
             break
         if (len(response)>0 and response != "b''"):
             cnt+=1
-        # if (cnt %10 ==0 ):
-        #     print(str(team_name) + ":" +str(cnt))
+        if (cnt %10 ==0 ):
+            print(str(team_name) + ":" +str(cnt))
     updateScore(team_name,cnt)
     sleep(0.1)
     print ("your personal score: " + str(cnt))
@@ -183,26 +183,27 @@ def pyTCPServer():
     global debug,connected,timesUP,minPlayers
     print("d:pyTCPServer started" + IP) if debug >= 2 else None
     TCPserverSocket = socket(AF_INET, SOCK_STREAM)
-    TCPserverSocket.bind((IP,portTCP))
+    TCPserverSocket.bind(("",portTCP))
+    print(str(host) +":"+ str(portTCP))
     TCPserverSocket.listen(3)
     global lstTCPs
     start_new_thread(reminder,())
     start_new_thread(acceptor,(TCPserverSocket,))
     while (not timesUP):
+        sleep(1)
         # note: minPlayers!!
-        if ( len(lstTCPs) >= minPlayers ):
-            print("d:if ( len(lstTCPs)") if debug >= 2 else None
-            for targCon in lstTCPs:
-                try:
-                    start_new_thread(TCPgame,(targCon,lstTCPs[targCon]))
-                    print("d:start_new_thread(TCPgame") if debug >= 2 else None
-                    pass
-                except errorExcept: # !!!!!!!!!!!!!!!!!
-                    print("d:connectionSocket.timeout") if debug >= 2 else None
-                    pass
-                print("d:pass - pyTCPServer") if debug >= 2 else None
+    if ( len(lstTCPs) >= minPlayers ):
+        print("d:if ( len(lstTCPs)") if debug >= 2 else None
+        for targCon in lstTCPs:
+            try:
+                start_new_thread(TCPgame,(targCon,lstTCPs[targCon]))
+                print("d:start_new_thread(TCPgame") if debug >= 2 else None
                 pass
-            break
+            except errorExcept: # !!!!!!!!!!!!!!!!!
+                print("d:connectionSocket.timeout") if debug >= 2 else None
+                pass
+            print("d:pass - pyTCPServer") if debug >= 2 else None
+            pass
     sleep(5)
     while True:
         sleep(1)
