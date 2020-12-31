@@ -5,11 +5,11 @@ import threading
 from struct import *
 from time import *
 import traceback
+import random
 
 ########## variables ##########
-debug = 0
-IP = '192.168.1.104'
 IP = '192.168.14.6'
+IP = '192.168.1.104'
 # IP = ''
 host = gethostname()                           
 portUDP = 13401
@@ -20,43 +20,117 @@ timesUP = False
 reminderStartGame = False
 minPlayers = 2
 connected = 0
+debug = 0
+lstTCPs = {}
+group1 = {}
+group2 = {}
+
+####### GROUP METHODS ########
+def pick_random_group():
+    global group1,group2
+    groups = [group1,group2]
+    if(len(group1)==len(group2)):
+        return random.choice(groups)
+    elif(len(group1)>len(group2)):
+        return group2
+    else:
+        return group1
+
+def groupCount(group):
+    sum = 0
+    for item in group.values():
+        sum+=item
+    return sum
+
+def updateScore(team_name,cnt):
+    global group1,group2
+    if team_name in group1.keys():
+        group1[team_name] = cnt
+    else:
+        group2[team_name] = cnt
+
+def countGroupsScore(i):
+    global group1,group2
+    if i == 1:
+        return groupCount(group1)
+    elif i == 2:
+        return groupCount(group2)
+
+def winningGroup():
+    global group1,group2
+    if(groupCount(1)>=groupCount(2)):
+        return 1
+    else:
+        return 2
+####### /GROUP METHODS ########
+
+def createGameMessage():
+    global group1,group2
+    a = "Welcome to Keyboard Spamming Battle Royale.\n"
+    a = a + "Group 1:\n"
+    for item in group1.keys():
+        a = a + str(item) + "\n"
+    a = a + "Group 2:\n"
+    for item in group2.keys():
+        a = a + str(item) + "\n"
+    a = a + "Start pressing keys on your keyboard as fast as you can!!"
+    return a
+
+def groupTeamNames(i):
+    global group1,group2
+    a = ""
+    if(i == 1):
+        for item in group1.keys():
+            a = a + str(item) + "\n"
+    elif(i==2):
+        for item in group2.keys():
+            a = a + str(item) + "\n"
+    return a
+
+
+def createEndMessage():
+    global group1,group2
+    winnernumber = winningGroup()
+    a = "Game over!\n"
+    a = a + "Group 1 typed in " + str(countGroupsScore(1)) + " characters. Group 2 typed in " + str(countGroupsScore(2)) + " characters.\n"
+    a = a + "Group " + str(winnernumber) + " wins!\n\n"
+    a = a + "Congragulations to the winners:\n"
+    a = a + groupTeamNames(winnernumber)
+    return a
+
+    
 
 def TCPgame(connectionSocket,addr):
-    global debug
+    global debug,timesUP,connected,teamsDict
     print("d:TCPgame starts") if debug >=2 else None
-    global timesUP
     cnt = 0
-    connectionSocket.sendall(b"Welcome to Keyboard Spamming Battle Royale.")
-    team_name = connectionSocket.recv(bufsize)
-    print("Team name is : " + str(team_name))
-    # add teamname and socket to dict
-    global teamsDict
-    teamsDict[team_name] = connectionSocket
-    print("Got a connection from %s" % str(addr))
-    global connected
+    team_name = connectionSocket.recv(bufsize).decode("utf-8")
+    print("Team name is : " + team_name)
+    teamsDict[team_name] = connectionSocket                 # add teamname and socket to dict
+    pick_random_group()[team_name] = 0
     connected +=1
-    # print(timesUP)
     while not timesUP:
         sleep(0.1)
         pass
-    while ( connected != minPlayers ):
-        sleep(0.01)
-        pass
+    # while ( connected != minPlayers ):
+    #     sleep(0.01)
+    #     pass
     start_new_thread(reminderStart,())
-    print("game is live from port " + str(addr[1]))
-    connectionSocket.send(b"Start pressing keys on your keyboard as fast as you can!!")
+    message = createGameMessage()
+    connectionSocket.sendall(message.encode("utf-8")) # start game message
     while not reminderStartGame:
         response = (connectionSocket.recv(bufsize)).decode("utf-8")
-        # print("r:" + response)
         if ( response == "done"):
-            print("d: break, send score")
             break
         if (len(response)>0 and response != "b''"):
             cnt+=1
-        if (cnt %10 ==0 ):
-            print(str(team_name) + ":" +str(cnt))
-    print (("finel score: " + str(cnt)).encode('utf-8'))
-    connectionSocket.send(("your score is: " + str(cnt)).encode('utf-8') )
+        # if (cnt %10 ==0 ):
+        #     print(str(team_name) + ":" +str(cnt))
+    updateScore(team_name,cnt)
+    sleep(0.1)
+    print ("your personal score: " + str(cnt))
+    endgameMessage = createEndMessage()
+    connectionSocket.sendall(endgameMessage.encode('utf-8') )
     sleep(1)
     print("TCP is closing connection from port %s" % str(addr))
     connectionSocket.close()
@@ -106,15 +180,10 @@ def acceptor(TCPserverSocket):
         lstTCPs[connectionSocket] = addr
 
 def pyTCPServer():
-    global debug
-    global connected
+    global debug,connected,timesUP,minPlayers
     print("d:pyTCPServer started" + IP) if debug >= 2 else None
-    global timesUP
-    global minPlayers
-    # todo: add tuple for difrent TCP , 2 groups
     TCPserverSocket = socket(AF_INET, SOCK_STREAM)
     TCPserverSocket.bind((IP,portTCP))
-    # queue up to 5 requests
     TCPserverSocket.listen(3)
     global lstTCPs
     start_new_thread(reminder,())
@@ -144,11 +213,10 @@ def pyTCPServer():
         
 
 def threaded_udp_message(serverSocket): 
-    print("d:threaded_udp_message started")
+    print("d:threaded_udp_message started") if debug >= 1 else None
     message = pack('IBH',4276993775,2,portTCP)
     for i in range(10):
         serverSocket.sendto(message, ('<broadcast>', portUDP))
-        print("d:message sent!")
         sleep(1)
         pass
     # connection closed 
@@ -156,7 +224,7 @@ def threaded_udp_message(serverSocket):
 
 def main():
     global debug
-    print("d:Server started, listening on IP address" + IP)
+    print("Server started, listening on IP address " + IP)
     serverSocket = socket(AF_INET, SOCK_DGRAM)
     serverSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     start_new_thread(threaded_udp_message,(serverSocket,))
