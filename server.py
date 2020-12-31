@@ -58,7 +58,7 @@ def countGroupsScore(i):
 
 def winningGroup():
     global group1,group2
-    if(groupCount(1)>=groupCount(2)):
+    if(groupCount(group1)>=groupCount(group2)):
         return 1
     else:
         return 2
