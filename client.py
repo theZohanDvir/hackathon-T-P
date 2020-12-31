@@ -22,43 +22,45 @@ localCNT = 0
 def on_press(key):
     global clientsocketTCPsend
     global localCNT
-    print(str(key))
+    print(str(key)) if debug >= 2 else None
     try:
         clientsocketTCPsend.sendall(str(key).encode('utf-8'))
         localCNT+=1
     except:
-        print("not sent: " + str(key))
+        print("e:not sent: " + str(key))
         pass
     
 
 def TCPgame(clientsocket):
+    global debug
+    print( "d:TCPgame start") if debug >= 1 else None
     global clientsocketTCPsend
     clientsocketTCPsend = clientsocket
     print(clientsocketTCPsend)
-    print( "d:start game")
-    response = clientsocket.recv(bufsize) # waiting for the game start message
+    print( "d:start game") if debug >= 1 else None
+    response = clientsocket.recv(bufsize) # get ready messgae
     print (response.decode("utf-8"))
     groupName = input("Enter the group name: ")
-    clientsocket.send(bytes(groupName, 'utf-8')) # sends the name
+    clientsocket.send(groupName.encode("utf-8")) # sends the name
     print(str(clientsocket.recv(bufsize))) # print start typeing
     with Listener(on_press=on_press) as listener:  # Create an instance of Listener
         Timer(10, listener.stop).start()
-        print("test1")
+        print("test1") if debug >= 2 else None
         listener.join()  # Join the listener thread to the main thread to keep waiting for keys
-    print("test2")
+    print("test2") if debug >= 2 else None
     try:
-        print("d:start wait for server answer?")
+        print("d:start wait for server answer?") if debug >= 1 else None
         clientsocket.sendall(str("done").encode('utf-8'))
         print(str(clientsocket.recv(bufsize))) # waiting for score
     except:
-        print("d:didn't get score from server.")
+        print("d:didn't get score from server.") if debug >= 1 else None
         pass
-    print("d:localCNT: " + str(localCNT))
+    print("d:localCNT: " + str(localCNT)) if debug >= 1 else None
 
 
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
-    # TCP connection   
+    # TCP connection
     
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
@@ -92,8 +94,10 @@ def pyUDPClient():
     
 
 def main():
-    print("d: client begin")
+    global debug
+    print("d: client begin") if debug >=1 else None
     address = pyUDPClient()
+    print("d: client ends") if debug >=1 else None
 
 
 if __name__ == "__main__":
