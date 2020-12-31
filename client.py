@@ -17,6 +17,7 @@ portTCP = 13601
 bufsize = 2048
 clientsocketTCPsend = None
 localCNT = 0
+debug = 0
 ##########
 
 def on_press(key):
@@ -33,16 +34,13 @@ def on_press(key):
 
 def TCPgame(clientsocket):
     global debug
-    print( "d:TCPgame start") if debug >= 1 else None
     global clientsocketTCPsend
+    print( "d:TCPgame start") if debug >= 1 else None
     clientsocketTCPsend = clientsocket
-    print(clientsocketTCPsend)
     print( "d:start game") if debug >= 1 else None
-    response = clientsocket.recv(bufsize) # get ready messgae
-    print (response.decode("utf-8"))
     groupName = input("Enter the group name: ")
     clientsocket.send(groupName.encode("utf-8")) # sends the name
-    print(str(clientsocket.recv(bufsize))) # print start typeing
+    print(clientsocket.recv(bufsize).decode("utf-8")) # welcome and print start typeing
     with Listener(on_press=on_press) as listener:  # Create an instance of Listener
         Timer(10, listener.stop).start()
         print("test1") if debug >= 2 else None
@@ -51,7 +49,7 @@ def TCPgame(clientsocket):
     try:
         print("d:start wait for server answer?") if debug >= 1 else None
         clientsocket.sendall(str("done").encode('utf-8'))
-        print(str(clientsocket.recv(bufsize))) # waiting for score
+        print(clientsocket.recv(bufsize).decode("utf-8")) # waiting for score
     except:
         print("d:didn't get score from server.") if debug >= 1 else None
         pass
@@ -60,8 +58,6 @@ def TCPgame(clientsocket):
 
 def pyTCPClient(address, serverPort):
     print ("d: start TCP connection" )
-    # TCP connection
-    
     clientsocket = socket(AF_INET, SOCK_STREAM)
     clientsocket.connect((address[0],serverPort))
     TCPgame(clientsocket)
@@ -72,25 +68,14 @@ def pyUDPClient():
     print("Client started, listening for offer requests...")
     clientSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
     clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-    # message = "d: i want to connect"
-    # clientSocket.sendto(message,(IP,portUDP))
-    # print ("d: waiting for message" )
     clientSocket.bind((IP, portUDP))
     data, addr = clientSocket.recvfrom(bufsize) # waiting for invaites
-    print ( "addr:" + str(addr))
     print ("Received offer from " + addr[0] +", attempting to connect...")
     magicCookie, messageType, serverPort = unpack('IBH',data)
-    print ("magicCookie: " + str(magicCookie))
-    print ("messageType: " + str(messageType))
-    print ("server port: " + str(serverPort))
     if ( magicCookie != 4276993775 or messageType != 2):
         print( " magicCookie != 4276993775 and messageType != 2 ")
     clientSocket.close()
     pyTCPClient(addr, serverPort)
-    # message = "i want to connect"
-    # clientSocket.sendto(message,(IP,portUDP))
-    # print ("d:" + addr )
-    # print ("d:received message: %s"%data)
     
 
 def main():
